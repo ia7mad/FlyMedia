@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Extract version from tag
+        id: version
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+
+      - name: Publish self-contained EXE
+        run: |
+          dotnet publish -c Release -r win-x64 `
+            --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -p:EnableCompressionInSingleFile=true `
+            -p:Version=${{ steps.version.outputs.VERSION }}
+
+      - name: Rename output
+        shell: pwsh
+        run: |
+          $src = "bin\Release\net8.0-windows10.0.22000.0\win-x64\publish\FlyMedia.exe"
+          Copy-Item $src "FlyMedia-${{ github.ref_name }}.exe"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: FlyMedia ${{ github.ref_name }}
+          files: FlyMedia-${{ github.ref_name }}.exe
+          generate_release_notes: true
+          body: |
+            ## Install
+            1. Download **FlyMedia-${{ github.ref_name }}.exe** below
+            2. Run it — no installer needed, no .NET required
+            3. A tray icon appears near the clock — right-click for settings
+
+            **Requires:** Windows 10 / 11 (64-bit)
