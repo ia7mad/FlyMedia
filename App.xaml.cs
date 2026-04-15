@@ -1,6 +1,8 @@
 using System.Windows;
 using MediaOverlay.Services;
 using MediaOverlay.ViewModels;
+using Velopack;
+using Velopack.Sources;
 
 namespace MediaOverlay;
 
@@ -70,6 +72,27 @@ public partial class App : System.Windows.Application
             _mainWindow.SetWidgetPosition(settings.WidgetCorner);
             _mainWindow.ToggleWidgetMode();
         }
+
+        // Check for updates silently in the background
+        _ = CheckForUpdatesAsync();
+    }
+
+    private static async Task CheckForUpdatesAsync()
+    {
+        try
+        {
+            var source  = new GithubSource("https://github.com/ia7mad/FlyMedia", null, false);
+            var manager = new UpdateManager(source);
+
+            if (!manager.IsInstalled) return;
+
+            var info = await manager.CheckForUpdatesAsync();
+            if (info == null) return;
+
+            await manager.DownloadUpdatesAsync(info);
+            manager.ApplyUpdatesAndRestart(info);
+        }
+        catch { /* network unavailable or any update error — silently ignored */ }
     }
 
     protected override void OnExit(ExitEventArgs e)

@@ -402,11 +402,17 @@
 
                 <!-- Footer -->
                 <Border Height="1" Background="#1AFFFFFF" Margin="0,16,0,12"/>
-                <TextBlock Text="FlyMedia  ·  v1.0"
-                           Foreground="#333333"
-                           FontFamily="Segoe UI"
-                           FontSize="11"
-                           HorizontalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Foreground="#333333" FontFamily="Segoe UI" FontSize="11">
+                        <Run Text="FlyMedia  ·  v1.0  ·  "/>
+                        <Hyperlink NavigateUri="https://github.com/ia7mad/FlyMedia"
+                                   RequestNavigate="Hyperlink_RequestNavigate"
+                                   Foreground="#555555"
+                                   TextDecorations="None">
+                            <Run Text="GitHub"/>
+                        </Hyperlink>
+                    </TextBlock>
+                </StackPanel>
 
             </StackPanel>
         </Grid>
