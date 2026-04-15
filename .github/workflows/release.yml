@@ -48,17 +48,22 @@ jobs:
             --mainExe FlyMedia.exe `
             --outputDir releases
 
+      - name: Rename Setup.exe
+        shell: pwsh
+        run: |
+          Rename-Item releases\Setup.exe "FlyMedia-${{ github.ref_name }}-Setup.exe"
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           name: FlyMedia ${{ github.ref_name }}
           files: |
-            releases/FlyMedia-${{ steps.version.outputs.VERSION }}-Setup.exe
+            releases/FlyMedia-${{ github.ref_name }}-Setup.exe
             releases/*.nupkg
           generate_release_notes: true
           body: |
             ## Install
-            1. Download **FlyMedia-${{ steps.version.outputs.VERSION }}-Setup.exe** below
+            1. Download **FlyMedia-${{ github.ref_name }}-Setup.exe** below
             2. Run it — no installer needed, no .NET required
             3. A tray icon appears near the clock — right-click for settings
 
